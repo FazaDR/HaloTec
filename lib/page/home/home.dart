@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:halotec/page/widget/navbar.dart'; // Import the custom bottom navbar
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -69,28 +70,10 @@ class _HomePageState extends State<HomePage> {
         toolbarHeight: 150, // Increase AppBar height to fit the search bar
       ),
       body: _pages[_selectedIndex], // Display the selected page content
-      // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Pencarian',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Pengajuan',
-          ),
-        ],
+      // Use the CustomBottomNavbar widget
+      bottomNavigationBar: CustomBottomNavbar(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }

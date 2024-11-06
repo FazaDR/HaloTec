@@ -40,8 +40,7 @@ class RegisterPage extends StatelessWidget {
                         style: TextStyle(fontSize: 40, color: Colors.white),
                       ),
                     ),
-                    SizedBox(height: 20),
-                    RoundedInput("E-Mail", Icons.email),
+
                     SizedBox(height: 20),
                     RoundedInput("Nama Lengkap", Icons.person),
                     SizedBox(height: 20),
@@ -49,12 +48,110 @@ class RegisterPage extends StatelessWidget {
                     SizedBox(height: 20),
                     RoundedInput("Nomor Telepon", Icons.phone),
                     SizedBox(height: 20),
-                    RoundedInput("Nama Referal (opsional)", Icons.group),
+                    RoundedInput("Username", Icons.group),
                     SizedBox(height: 20),
-                    RoundedInput("Password", Icons.lock),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              obscureText: true, // Make the password input obscured
+                              style: TextStyle(fontSize: 12, color: Colors.black),
+                              decoration: InputDecoration(
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.lock,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(width: 10),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20), // Add more space here between password and dropdown
+                    
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              obscureText: true, // Make the confirmation password input obscured
+                              style: TextStyle(fontSize: 12, color: Colors.black),
+                              decoration: InputDecoration(
+                                hintText: "Konfirmasi Password",
+                                hintStyle: TextStyle(color: Colors.grey),
+                                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.lock_outline,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(width: 10),
+                        ],
+                      ),
+                    ),
+                    
                     SizedBox(height: 20),
-                    RoundedInput("Konfirmasi Password", Icons.lock_outline),
-                    SizedBox(height: 10),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: 150,  // Set a maximum width to make the dropdown shorter
+                        ),
+                        child: DropdownButtonFormField<String>(
+                          hint: Text(
+                            "Gender",
+                            style: TextStyle(
+                              color: Colors.grey,  // Set hint text color to grey
+                              fontSize: 12,        // Set hint text size to 12
+                            ),
+                          ),
+                          onChanged: (String? newValue) {
+                            // No need to manage the state of the selected value
+                          },
+                          items: <String>['Laki-laki', 'Perempuan']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: TextStyle(fontSize: 12),  // Font size set to 12 for items
+                              ),
+                            );
+                          }).toList(),
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 19), // Adjust padding to center the hint text
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(color: Colors.grey, fontSize: 12), // Grey hint text with font size 12
+                            alignLabelWithHint: true, // Align label with hint text
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(height: 10), // Space below the dropdown
+
                     Row(
                       children: [
                         Text(

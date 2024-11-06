@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'page/widget/Auth.dart'; // Adjust the import according to your file structure
+import 'page/Auth.dart'; // Adjust the import according to your file structure
 
 void main() {
   runApp(MyApp());
