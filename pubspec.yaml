@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  shared_preferences: ^2.0.15
+  http: ^1.2.2
+    
 
 dev_dependencies:
   flutter_test:
@@ -22,3 +25,4 @@ flutter:
     - assets/flipped.png
     - assets/register.png
     - assets/placeholder.png
+    - assets/semicircle.png

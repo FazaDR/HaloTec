@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:halotec/page/widget/navbar.dart'; // Import the custom bottom navbar
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+class WorkerHomePage extends StatefulWidget {
+  const WorkerHomePage({Key? key}) : super(key: key);
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _WorkerHomePageState createState() => _WorkerHomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _WorkerHomePageState extends State<WorkerHomePage> {
   // Variable to track the selected index of the bottom navigation bar
   int _selectedIndex = 0;
 
   // List of pages for navigation
   final List<Widget> _pages = [
-    Center(child: Text('Home Page Content')),
-    Center(child: Text('Profile Page Content')),
-    Center(child: Text('Pencarian Page Content')),
-    Center(child: Text('Pengajuan Page Content')),
+    Center(child: Text('Worker Home Page Content')),
+    Center(child: Text('Worker Profile Page Content')),
+    Center(child: Text('Worker Tasks Page Content')),
+    Center(child: Text('Worker Reports Page Content')),
   ];
 
   // Method to handle bottom navigation item selection
@@ -38,7 +38,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'HaloTec',
+              'HaloTec Worker',
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
@@ -57,7 +57,7 @@ class _HomePageState extends State<HomePage> {
                 child: TextField(
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
-                    hintText: 'Search...',
+                    hintText: 'Search Tasks...',
                     border: InputBorder.none,
                     prefixIcon: Icon(Icons.search, color: Colors.grey),
                     contentPadding: EdgeInsets.symmetric(vertical: 10), // Center the text vertically

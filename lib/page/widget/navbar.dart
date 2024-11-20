@@ -20,12 +20,12 @@ class CustomBottomNavbar extends StatelessWidget {
       type: BottomNavigationBarType.fixed, // Disable zoom effect on selected item
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: 'Profile',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.search),

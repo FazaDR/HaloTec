@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Halotec',
       home: AuthPage(), // Use your AuthPage that contains the PageView
+      
     );
   }
 }
