@@ -11,6 +11,10 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.0.15
   http: ^1.2.2
+  image_picker: ^0.8.5+3
+  flutter_rating_bar: ^4.0.0
+  url_launcher: ^6.0.9
+  intl: ^0.18.0
     
 
 dev_dependencies:
@@ -26,3 +30,4 @@ flutter:
     - assets/register.png
     - assets/placeholder.png
     - assets/semicircle.png
+    - assets/download.jpg

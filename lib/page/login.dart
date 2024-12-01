@@ -3,9 +3,13 @@ import 'package:halotec/page/user/home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:halotec/db/db_akun.dart';
 import 'dart:convert'; // For json.decode
+import 'package:halotec/db/db_user_data.dart';
+import 'package:halotec/util/SharedPreferences.dart';
 import 'package:halotec/page/worker/homeWorker.dart'; // Import the worker home page
+import 'package:halotec/page/worker/profileCompletion.dart'; // Import the worker profile page
 import 'widget/RoundedInput.dart'; // Import your custom RoundedInput
-import 'package:halotec/page/worker/profileCompletion.dart';
+import 'package:halotec/db/db_worker_data.dart'; // Import the worker data service
+import 'package:halotec/page/user/navbar_user.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback onRegisterTap;
@@ -50,43 +54,91 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     if (!showUsernameWarning && !showPasswordWarning) {
-      final response = await login(usernameCont.text, passCont.text);  // Call the existing login function
+      try {
+        final response = await login(usernameCont.text, passCont.text);
 
-      if (response != null && response.body.isNotEmpty) {
-        var jsonResp = json.decode(response.body);
+        if (response != null && response.body.isNotEmpty) {
+          var jsonResp = json.decode(response.body);
 
-        if (jsonResp['status'] == 'success') {
-          var userData = jsonResp['user']['user_data'];
-          if (userData != null) {
-            // Save authentication and user role in SharedPreferences
-            final prefs = await SharedPreferences.getInstance();
-            prefs.setBool('isLoggedIn', true);
-            prefs.setString('role', jsonResp['user']['role']);
-            prefs.setString('username', jsonResp['user']['username']);
+          if (jsonResp['status'] == 'success') {
+            final user = jsonResp['user'];
+            final role = user['role'];
 
-            // Navigate to the appropriate page based on user role
-            if (jsonResp['user']['role'] == 'user') {
-              // Navigate to the normal user home page
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-              );
-            } else if (jsonResp['user']['role'] == 'worker') {
-              // Navigate to the worker home page
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => CompleteProfilePage()),
-              );
+            if (role == 'worker') {
+              final workerData = await getWorkerData(user['username']);
+              if (workerData != null) {
+                bool isFirstLogin = workerData['is_first_login'] ?? true;
+
+                await SharedPreferencesHelper.saveLoginData(
+                  isLoggedIn: true,
+                  username: user['username'],
+                  role: role,
+                  idWorker: workerData['id_worker'].toString(),
+                  nama: workerData['nama'],
+                  pengalamanKerja: workerData['pengalaman_kerja'],
+                  rangeHarga: workerData['range_harga'],
+                  deskripsi: workerData['deskripsi'],
+                  paymentPlan: workerData['payment_plan'],
+                  profilePic: workerData['profile_pic'] ?? 'https://example.com/default-profile-pic.png',
+                  kategori: workerData['kategori'].toString(),
+                  keahlian: workerData['keahlian'],
+                  isFirstLogin: isFirstLogin, // Save isFirstLogin status
+                );
+
+                if (isFirstLogin) {
+                  // Navigate to CompleteProfilePage for first-time login
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => CompleteProfilePage()),
+                  );
+                } else {
+                  // Navigate to WorkerHomePage for returning workers
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => WorkerHomePage()),
+                  );
+                }
+              } else {
+                dialog(context, 'Failed to fetch worker data.');
+              }
+            } else {
+              final userData = await getUserData(user['username']);
+              if (userData != null) {
+                await SharedPreferencesHelper.saveLoginData(
+                  isLoggedIn: true,
+                  username: user['username'],
+                  role: role,
+                  idUser: userData['id_user'].toString(),
+                  nama: userData['nama'],
+                  alamat: userData['alamat'],
+                  telpon: userData['telpon'],
+                  gender: userData['gender'],
+                  profilePic: userData['profile_pic'] ?? 'https://example.com/default-profile-pic.png',
+                );
+
+                // Navigate to NavbarUser for normal users
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NavbarUser(),
+                  ),
+                );
+              } else {
+                dialog(context, 'Failed to fetch user data.');
+              }
             }
+          } else {
+            dialog(context, jsonResp['message'] ?? 'Unknown error occurred');
           }
         } else {
-          dialog(context, jsonResp['message']);
+          dialog(context, 'Username atau Password salah');
         }
-      } else {
-        dialog(context, 'No response from server');
+      } catch (e) {
+        dialog(context, 'Service unavailable. Please try again later.');
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

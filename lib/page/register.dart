@@ -81,7 +81,7 @@ Future<void> registerUser() async {
       !showUsernameWarning &&
       !showPasswordWarning &&
       !showConfirmPasswordWarning) {
-    final url = Uri.parse('$apiBaseUrl/akun/create.php');
+    final url = Uri.parse('$apiBaseUrl/halotec/akun/create.php');
     final response = await http.post(
       url,
       headers: {"Content-Type": "application/json"},
