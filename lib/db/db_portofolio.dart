@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class Portfolio {
   final int idPortfolio;
   final int idWorker;
-  final String imageUrl;
+  String imageUrl;
   final String? caption;
 
   Portfolio({

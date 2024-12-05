@@ -5,7 +5,7 @@ import 'package:halotec/db/db_akun.dart';
 import 'dart:convert'; // For json.decode
 import 'package:halotec/db/db_user_data.dart';
 import 'package:halotec/util/SharedPreferences.dart';
-import 'package:halotec/page/worker/homeWorker.dart'; // Import the worker home page
+import 'package:halotec/page/worker/navbar_worker.dart'; // Import the worker home page
 import 'package:halotec/page/worker/profileCompletion.dart'; // Import the worker profile page
 import 'widget/RoundedInput.dart'; // Import your custom RoundedInput
 import 'package:halotec/db/db_worker_data.dart'; // Import the worker data service
@@ -47,97 +47,124 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _login() async {
-    setState(() {
-      showUsernameWarning = usernameCont.text.isEmpty;
-      showPasswordWarning = passCont.text.isEmpty;
-    });
+void _login() async {
+  // Validate input fields
+  setState(() {
+    showUsernameWarning = usernameCont.text.isEmpty;
+    showPasswordWarning = passCont.text.isEmpty;
+  });
 
-    if (!showUsernameWarning && !showPasswordWarning) {
-      try {
-        final response = await login(usernameCont.text, passCont.text);
+  if (!showUsernameWarning && !showPasswordWarning) {
+    try {
+      // Debug: log username and password fields (excluding actual password for security)
+      print('Debug: Attempting login for username: ${usernameCont.text}');
 
-        if (response != null && response.body.isNotEmpty) {
-          var jsonResp = json.decode(response.body);
+      // Call login API
+      final response = await login(usernameCont.text, passCont.text);
 
-          if (jsonResp['status'] == 'success') {
-            final user = jsonResp['user'];
-            final role = user['role'];
+      if (response != null && response.body.isNotEmpty) {
+        print('Debug: Login API response: ${response.body}');
+        var jsonResp = json.decode(response.body);
 
-            if (role == 'worker') {
-              final workerData = await getWorkerData(user['username']);
-              if (workerData != null) {
-                bool isFirstLogin = workerData['is_first_login'] ?? true;
+        if (jsonResp['status'] == 'success') {
+          final user = jsonResp['user'];
+          final role = user['role'];
+          print('Debug: Login successful for username: ${user['username']}, role: $role');
 
-                await SharedPreferencesHelper.saveLoginData(
-                  isLoggedIn: true,
-                  username: user['username'],
-                  role: role,
-                  idWorker: workerData['id_worker'].toString(),
-                  nama: workerData['nama'],
-                  pengalamanKerja: workerData['pengalaman_kerja'],
-                  rangeHarga: workerData['range_harga'],
-                  deskripsi: workerData['deskripsi'],
-                  paymentPlan: workerData['payment_plan'],
-                  profilePic: workerData['profile_pic'] ?? 'https://example.com/default-profile-pic.png',
-                  kategori: workerData['kategori'].toString(),
-                  keahlian: workerData['keahlian'],
-                  isFirstLogin: isFirstLogin, // Save isFirstLogin status
-                );
+          if (role == 'worker') {
+            // Fetch worker data
+            final workerData = await getWorkerData(user['username']);
+            print('Debug: Worker data fetched for username: ${user['username']}, data: $workerData');
 
-                if (isFirstLogin) {
-                  // Navigate to CompleteProfilePage for first-time login
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => CompleteProfilePage()),
-                  );
-                } else {
-                  // Navigate to WorkerHomePage for returning workers
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => WorkerHomePage()),
-                  );
-                }
-              } else {
-                dialog(context, 'Failed to fetch worker data.');
-              }
-            } else {
-              final userData = await getUserData(user['username']);
-              if (userData != null) {
-                await SharedPreferencesHelper.saveLoginData(
-                  isLoggedIn: true,
-                  username: user['username'],
-                  role: role,
-                  idUser: userData['id_user'].toString(),
-                  nama: userData['nama'],
-                  alamat: userData['alamat'],
-                  telpon: userData['telpon'],
-                  gender: userData['gender'],
-                  profilePic: userData['profile_pic'] ?? 'https://example.com/default-profile-pic.png',
-                );
+            if (workerData != null) {
+              bool isFirstLogin = workerData['is_first_login'] ?? true;
+              print('Debug: Worker isFirstLogin status: $isFirstLogin');
 
-                // Navigate to NavbarUser for normal users
+              // Save worker data to SharedPreferences
+              await SharedPreferencesHelper.saveLoginData(
+                isLoggedIn: true,
+                username: user['username'],
+                role: role,
+                idWorker: workerData['id_worker'].toString(),
+                nama: workerData['nama'],
+                telpon: workerData['telpon'],
+                pengalamanKerja: workerData['pengalaman_kerja'],
+                rangeHarga: workerData['range_harga'],
+                deskripsi: workerData['deskripsi'],
+                paymentPlan: workerData['payment_plan'],
+                profilePic: workerData['profile_pic'] ?? 'https://example.com/default-profile-pic.png',
+                kategori: workerData['kategori'].toString(),
+                keahlian: workerData['keahlian'],
+                isFirstLogin: isFirstLogin,
+              );
+
+              // Navigate to the appropriate page
+              if (isFirstLogin) {
+                print('Debug: Navigating to CompleteProfilePage for worker.');
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => NavbarUser(),
-                  ),
+                  MaterialPageRoute(builder: (context) => CompleteProfilePage()),
                 );
               } else {
-                dialog(context, 'Failed to fetch user data.');
+                print('Debug: Navigating to WorkerNavbar for worker.');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => WorkerNavbar()),
+                );
               }
+            } else {
+              print('Debug: Failed to fetch worker data.');
+              dialog(context, 'Failed to fetch worker data.');
             }
           } else {
-            dialog(context, jsonResp['message'] ?? 'Unknown error occurred');
+            // Fetch normal user data
+            final userData = await getUserData(user['username']);
+            print('Debug: User data fetched for username: ${user['username']}, data: $userData');
+
+            if (userData != null) {
+              // Save user data to SharedPreferences
+              await SharedPreferencesHelper.saveLoginData(
+                isLoggedIn: true,
+                username: user['username'],
+                role: role,
+                idUser: userData['id_user'].toString(),
+                nama: userData['nama'],
+                alamat: userData['alamat'],
+                telpon: userData['telpon'],
+                gender: userData['gender'],
+                profilePic: userData['profile_pic'] ?? 'https://example.com/default-profile-pic.png',
+              );
+
+              // Navigate to NavbarUser for normal users
+              print('Debug: Navigating to NavbarUser for user.');
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NavbarUser(),
+                ),
+              );
+            } else {
+              print('Debug: Failed to fetch user data.');
+              dialog(context, 'Failed to fetch user data.');
+            }
           }
         } else {
-          dialog(context, 'Username atau Password salah');
+          print('Debug: Login failed with message: ${jsonResp['message']}');
+          dialog(context, jsonResp['message'] ?? 'Unknown error occurred');
         }
-      } catch (e) {
-        dialog(context, 'Service unavailable. Please try again later.');
+      } else {
+        print('Debug: Empty response or invalid credentials.');
+        dialog(context, 'Username atau Password salah');
       }
+    } catch (e) {
+      print('Debug: Exception occurred during login process - $e');
+      dialog(context, 'Service unavailable. Please try again later.');
     }
+  } else {
+    print('Debug: Validation failed - Username or Password is empty.');
   }
+}
+
 
 
   @override

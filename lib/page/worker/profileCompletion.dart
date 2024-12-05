@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:halotec/page/worker/navbar_worker.dart';
 import 'package:halotec/util/config.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -8,7 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:halotec/db/db_define_keahlian.dart';
 import 'package:halotec/page/Auth.dart';
 import 'package:halotec/util/SharedPreferences.dart';
-import 'package:halotec/page/worker/homeWorker.dart';
+
 
 class CompleteProfilePage extends StatefulWidget {
   const CompleteProfilePage({Key? key}) : super(key: key);
@@ -496,7 +497,7 @@ void showPaymentPlanDialog() {
 
               // Navigate to WorkerHomePage after submission
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => WorkerHomePage()),
+                MaterialPageRoute(builder: (context) => WorkerNavbar()),
               );
             },
             child: const Text("Confirm"),

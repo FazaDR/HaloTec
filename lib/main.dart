@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'page/Auth.dart'; // Authentication Page
 import 'page/worker/profileCompletion.dart'; // Worker Profile Completion Page
-import 'page/worker/homeWorker.dart'; // Worker Home Page
+import 'page/worker/navbar_worker.dart'; // Worker Home Page
 import 'page/user/navbar_user.dart'; // User Home Page
 
 void main() {
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
               case 'CompleteProfilePage':
                 return CompleteProfilePage();
               case 'WorkerHomePage':
-                return WorkerHomePage();
+                return WorkerNavbar();
               case 'UserHomePage':
                 return NavbarUser(); // Directly navigate to NavbarUser
               default:

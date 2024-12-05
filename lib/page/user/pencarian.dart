@@ -85,6 +85,8 @@ void _sortWorkers() {
   }
 }
 
+
+
 Future<void> _fetchData() async {
   setState(() {
     isLoading = true;
@@ -138,8 +140,12 @@ Future<void> _fetchData() async {
   }
 }
 
+  Future<void> _onRefresh() async {
+      await _fetchData(); // Refresh the services by fetching new data
+  }
 
-  @override
+
+@override
 Widget build(BuildContext context) {
   return Scaffold(
     backgroundColor: const Color(0xFFFFF6E1),
@@ -149,34 +155,37 @@ Widget build(BuildContext context) {
         isLoading
             ? Center(child: CircularProgressIndicator())
             : Expanded(
-                child: ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Category Dropdown
-                        Expanded(
-                          flex: 1, // Same flex value as the other dropdown
-                          child: isCategoryLoading
-                              ? Center(child: CircularProgressIndicator())
-                              : _buildCategoryDropdown(),
-                        ),
-                        SizedBox(width: 10.0), // Space between dropdowns
-                        
-                        // Additional Filter Dropdown
-                        Expanded(
-                          flex: 1, // Same flex value as the category dropdown
-                          child: _buildAdditionalFilterDropdown(),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 16.0), // Add some spacing after dropdown row
-                    if (workers.isEmpty)
-                      Center(child: Text('No workers found.'))
-                    else
-                      ...workers.map((worker) => _buildWorkerCard(worker)).toList(),
-                  ],
+                child: RefreshIndicator(
+                  onRefresh: _onRefresh, // This is the refresh function
+                  child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Category Dropdown
+                          Expanded(
+                            flex: 1, // Same flex value as the other dropdown
+                            child: isCategoryLoading
+                                ? Center(child: CircularProgressIndicator())
+                                : _buildCategoryDropdown(),
+                          ),
+                          SizedBox(width: 10.0), // Space between dropdowns
+                          
+                          // Additional Filter Dropdown
+                          Expanded(
+                            flex: 1, // Same flex value as the category dropdown
+                            child: _buildAdditionalFilterDropdown(),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.0), // Add some spacing after dropdown row
+                      if (workers.isEmpty)
+                        Center(child: Text('No workers found.'))
+                      else
+                        ...workers.map((worker) => _buildWorkerCard(worker)).toList(),
+                    ],
+                  ),
                 ),
               ),
       ],
@@ -195,7 +204,7 @@ Widget build(BuildContext context) {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -208,36 +217,15 @@ Widget build(BuildContext context) {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.exit_to_app, color: Colors.black),
+                  icon: const Icon(Icons.refresh, color: Colors.black),
                   onPressed: () {
-                    _logout(context); // Call the logout method
+                    _onRefresh(); // Call the logout method
                   },
                 ),
               ],
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 5),
             // Search bar
-            SizedBox(
-              height: 50.0,
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: 'Cari kategori....',
-                  hintStyle: const TextStyle(
-                    fontSize: 14.0,
-                    color: Colors.grey,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.search,
-                    size: 20.0,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-              ),
-            ),
           ],
         ),
       ),

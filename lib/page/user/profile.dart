@@ -16,9 +16,9 @@ class _ProfilePageState extends State<ProfilePage> {
   // State variables for editable fields
   String _username = '';
   String _email = '';
-  TextEditingController _fullNameController = TextEditingController();
-  TextEditingController _phoneNumberController = TextEditingController();
-  TextEditingController _addressController = TextEditingController();
+  String _fullName = '';
+  String _phoneNumber = '';
+  String _address = '';
   String _gender = '';
 
   @override
@@ -39,9 +39,9 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       _username = username;
       _email = username; // Assuming email is the username
-      _fullNameController.text = profileData['nama'] ?? 'No Name';
-      _phoneNumberController.text = profileData['telpon'] ?? 'No Phone Number';
-      _addressController.text = profileData['alamat'] ?? 'No Address';
+      _fullName = profileData['nama'] ?? 'No Name';
+      _phoneNumber = profileData['telpon'] ?? 'No Phone Number';
+      _address = profileData['alamat'] ?? 'No Address';
       _gender = profileData['gender'] ?? 'Unknown Gender';
       _profileImageUrl = profileImageUrl;  // Use the full URL for the profile picture
     });
@@ -122,10 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                         SizedBox(height: 12.0), // Space below the profile picture
-                        Text(
-                          _fullNameController.text.isNotEmpty
-                              ? _fullNameController.text
-                              : _username,
+                        Text(_fullName,
                           style: TextStyle(
                             fontSize: 20.0,
                             fontWeight: FontWeight.bold,
@@ -145,8 +142,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildProfileField('Username', _email, editable: false),
-                    _buildEditableField('No Telepon', _phoneNumberController),
-                    _buildEditableField('Alamat', _addressController),
+                    _buildProfileField('No Telepon', _phoneNumber, editable: false),
+                    _buildProfileField('Alamat', _address, editable:false),
                     _buildProfileField('Gender', _gender, editable: false),
                   ],
                 ),

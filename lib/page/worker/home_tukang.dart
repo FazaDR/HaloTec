@@ -6,28 +6,29 @@ import 'package:halotec/db/db_pemesanan.dart';
 import 'package:halotec/db/db_insert_review.dart';
 import 'package:halotec/db/db_delete_pemesanan.dart';
 
+// Halaman utama untuk tukang
 void main() {
-  runApp(PengajuanPage());
+  runApp(HomeTukangPage());
 }
 
-class PengajuanPage extends StatelessWidget {
+class HomeTukangPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HalotecHomePage(),
+      home: HomeTukangPageState(),
     );
   }
 }
 
-class HalotecHomePage extends StatefulWidget {
+class HomeTukangPageState extends StatefulWidget {
   @override
-  _HalotecHomePageState createState() => _HalotecHomePageState();
+  _HomeTukangPageState createState() => _HomeTukangPageState();
 }
 
 class ReviewDialog extends StatefulWidget {
   final Pemesanan service;
-  final VoidCallback onStatusUpdated; // Add this parameter
+  final VoidCallback onStatusUpdated; // Callback to update UI when status changes
 
   ReviewDialog({required this.service, required this.onStatusUpdated});
 
@@ -42,7 +43,7 @@ class _ReviewDialogState extends State<ReviewDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Give a Review for ${widget.service.workerNama}'),
+      title: Text('Give a Review for ${widget.service.userNama}'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -94,17 +95,17 @@ class _ReviewDialogState extends State<ReviewDialog> {
             }
 
             // Fetch the user ID asynchronously
-            String? userId = await SharedPreferencesHelper.getUserId();
-            if (userId != null) {
+            String? workerId = await SharedPreferencesHelper.getWorkerId();
+            if (workerId != null) {
               // Submit the review
               await submitReview(
-                userId, // User ID
+                workerId, // User ID
                 widget.service.idWorker, // Worker ID
                 selectedRating, // Rating
                 commentController.text.trim(), // Comment
               );
 
-              // Archive the service
+              // Archive the service (change status)
               await updateServiceStatus(widget.service.idPemesanan, 'canceled');
 
               // Notify parent widget to update the UI
@@ -126,28 +127,26 @@ class _ReviewDialogState extends State<ReviewDialog> {
   }
 }
 
-
-class _HalotecHomePageState extends State<HalotecHomePage> {
-  List<Pemesanan> services = [];
-
+class _HomeTukangPageState extends State<HomeTukangPageState> {
+    List<Pemesanan> services = [];
 
   @override
   void initState() {
     super.initState();
-    _loadUserAndServices();
+    _loadUserAndServices(); // Adjusted to reflect the new name
   }
 
   Future<void> _loadUserAndServices() async {
-    String? userId = await SharedPreferencesHelper.getUserId();
-    if (userId != null) {
-      await _fetchPemesananData(userId);
+    String? workerId = await SharedPreferencesHelper.getWorkerId();
+    if (workerId != null) {
+      await _fetchPemesananData(workerId);
     }
   }
 
   Future<void> _onRefresh() async {
-    String? userId = await SharedPreferencesHelper.getUserId();
-    if (userId != null) {
-      await _fetchPemesananData(userId); // Refresh the services by fetching new data
+    String? workerId = await SharedPreferencesHelper.getWorkerId();
+    if (workerId != null) {
+      await _fetchPemesananData(workerId); // Refresh the services by fetching new data
     }
   }
 
@@ -162,18 +161,53 @@ class _HalotecHomePageState extends State<HalotecHomePage> {
   //     (route) => false, // This ensures all previous routes are removed
   //   );
   // }
+  
+Future<void> _fetchPemesananData(String workerId) async {
+  print("Starting to fetch pemesanan data for workerId: $workerId");
 
-  Future<void> _fetchPemesananData(String userId) async {
-    try {
-      List<Pemesanan> fetchedServices =
-          await Pemesanan.fetchPemesananData(userId, true);
-      setState(() {
-        services = fetchedServices;
-      });
-    } catch (e) {
-      print("Error fetching pemesanan data: $e");
+  try {
+    print("Calling fetchPemesananData with workerId: $workerId and filter: false");
+
+    List<Pemesanan> fetchedServices =
+        await Pemesanan.fetchPemesananData(workerId, false);
+
+    print("Fetched ${fetchedServices.length} items. Details:");
+
+    for (var pemesanan in fetchedServices) {
+      print("""
+      -----
+      idPemesanan: ${pemesanan.idPemesanan}
+      Description: ${pemesanan.description}
+      Scheduled Date: ${pemesanan.scheduledDate}
+      Status: ${pemesanan.status}
+      Cancel Reason: ${pemesanan.cancelReason ?? 'None'}
+      Created At: ${pemesanan.createdAt}
+      User Info:
+        - Name: ${pemesanan.userNama}
+        - Phone: ${pemesanan.userTelpon}
+        - Address: ${pemesanan.userAlamat}
+        - Profile Pic: ${pemesanan.userProfilePic ?? 'None'}
+        - Gender: ${pemesanan.userGender}
+      Worker Info:
+        - Name: ${pemesanan.workerNama}
+        - Phone: ${pemesanan.workerTelpon}
+        - Profile Pic: ${pemesanan.workerProfilePic ?? 'None'}
+        - Category: ${pemesanan.workerKategori}
+      Worker ID: ${pemesanan.idWorker}
+      -----
+      """);
     }
+
+    setState(() {
+      services = fetchedServices;
+      print("State updated with fetched services.");
+    });
+  } catch (e, stackTrace) {
+    print("Error fetching pemesanan data: $e");
+    print("StackTrace: $stackTrace");
   }
+}
+
   
 
 void _archiveService(int idPemesanan, {bool isReviewCompleted = false}) async {
@@ -198,9 +232,9 @@ void _archiveService(int idPemesanan, {bool isReviewCompleted = false}) async {
 
 void _showReviewDialog(BuildContext context, Pemesanan service) async {
   // Fetch the user ID from SharedPreferences
-  String? userId = await SharedPreferencesHelper.getUserId();
+  String? workerId = await SharedPreferencesHelper.getWorkerId();
 
-  if (userId != null) {
+  if (workerId != null) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -208,7 +242,7 @@ void _showReviewDialog(BuildContext context, Pemesanan service) async {
           service: service,
           onStatusUpdated: () {
             setState(() {
-              _fetchPemesananData(userId); // Use the fetched user ID to update the UI
+              _fetchPemesananData(workerId); // Use the fetched user ID to update the UI
             });
           },
         );
@@ -355,7 +389,7 @@ Widget serviceCard(BuildContext context, Pemesanan service, IconData trailingIco
     child: Row(
       children: [
         CircleAvatar(
-          backgroundImage: NetworkImage(service.workerProfilePic),
+          backgroundImage: NetworkImage(service.userProfilePic),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -363,15 +397,15 @@ Widget serviceCard(BuildContext context, Pemesanan service, IconData trailingIco
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                service.workerNama,
+                service.userNama,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              if (service.workerKategori.isNotEmpty)
+              if (service.userAlamat.isNotEmpty)
                 Text(
-                  service.workerKategori,
+                  service.userAlamat,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Colors.black,

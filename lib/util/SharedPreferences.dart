@@ -28,22 +28,22 @@ class SharedPreferencesHelper {
     await prefs.setString('username', username);
     await prefs.setString('role', role);
 
-    if (idWorker != null) prefs.setString('id_worker', idWorker);
-    if (idUser != null) prefs.setString('id_user', idUser);
-    if (nama != null) prefs.setString('nama', nama);
-    if (pengalamanKerja != null) prefs.setInt('pengalaman_kerja', pengalamanKerja);
-    if (rangeHarga != null) prefs.setString('range_harga', rangeHarga);
-    if (deskripsi != null) prefs.setString('deskripsi', deskripsi);
-    if (paymentPlan != null) prefs.setString('payment_plan', paymentPlan);
-    if (profilePic != null) prefs.setString('profile_pic', profilePic);
-    if (kategori != null) prefs.setString('kategori', kategori);
-    if (keahlian != null) prefs.setString('keahlian', keahlian);
-    if (alamat != null) prefs.setString('alamat', alamat);
-    if (telpon != null) prefs.setString('telpon', telpon);
-    if (gender != null) prefs.setString('gender', gender);
+    if (idWorker != null) prefs.setString('id_worker', idWorker);//worker
+    if (idUser != null) prefs.setString('id_user', idUser);//user
+    if (nama != null) prefs.setString('nama', nama);//worker&user
+    if (pengalamanKerja != null) prefs.setInt('pengalaman_kerja', pengalamanKerja);//worker
+    if (rangeHarga != null) prefs.setString('range_harga', rangeHarga);//worker
+    if (deskripsi != null) prefs.setString('deskripsi', deskripsi);//user
+    if (paymentPlan != null) prefs.setString('payment_plan', paymentPlan);//worker
+    if (profilePic != null) prefs.setString('profile_pic', profilePic);//worker&user
+    if (kategori != null) prefs.setString('kategori', kategori);//worker
+    if (keahlian != null) prefs.setString('keahlian', keahlian);//worker
+    if (alamat != null) prefs.setString('alamat', alamat);//user
+    if (telpon != null) prefs.setString('telpon', telpon);//worker&user
+    if (gender != null) prefs.setString('gender', gender);//user
 
     if (isFirstLogin != null) {
-      await prefs.setBool('isFirstLogin', isFirstLogin); // Save the `isFirstLogin` status
+      await prefs.setBool('isFirstLogin', isFirstLogin); 
     }
   }
 
@@ -51,6 +51,25 @@ class SharedPreferencesHelper {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
+
+  static Future<Map<String, String?>> getWorkerData() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return {
+      'id_worker': prefs.getString('id_worker'),
+      'username':prefs.getString('username'), 
+      'nama': prefs.getString('nama'),
+      'pengalaman_kerja': prefs.getInt('pengalaman_kerja')?.toString(),
+      'range_harga': prefs.getString('range_harga'),
+      'payment_plan': prefs.getString('payment_plan'),
+      'profile_pic': prefs.getString('profile_pic'),
+      'kategori': prefs.getString('kategori'),
+      'keahlian': prefs.getString('keahlian'),
+      'deskripsi':prefs.getString('deskripsi'),
+      'telpon': prefs.getString('telpon')
+    };
+  }
+
 
   // New method: Retrieve user profile data
   static Future<Map<String, String?>> getUserProfileData() async {
@@ -88,5 +107,10 @@ class SharedPreferencesHelper {
   static Future<bool?> getIsFirstLogin() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('isFirstLogin');
+  }
+
+  static Future<String?> getWorkerId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('id_worker');
   }
 }
